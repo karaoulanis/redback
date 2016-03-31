@@ -44,7 +44,11 @@
 #include "RedbackThermalPressurization.h"
 #include "RedbackDamage.h"
 
+// Scalar Kernels
+#include "RedbackContinuation.h"
+
 // Materials
+#include "ImageProcessing.h"
 #include "RedbackMaterial.h"
 #include "RedbackMechMaterialJ2.h"
 #include "RedbackMechMaterialDP.h"
@@ -52,10 +56,15 @@
 #include "RedbackMechMaterialCCanisotropic.h"
 #include "RedbackMechMaterialElastic.h"
 
+// MeshModifiers
+#include "ElementFileSubdomain.h"
+
 // Timesteppers
 #include "ReturnMapIterDT.h"
 
 // AuxKernels
+#include "RedbackContinuationTangentAux.h"
+#include "RedbackDiffVarsAux.h"
 #include "RedbackTotalPorosityAux.h"
 
 template <>
@@ -116,6 +125,9 @@ RedbackApp::registerObjects(Factory & factory)
   registerKernel(RedbackThermalPressurization);
   registerKernel(RedbackDamage);
 
+  registerScalarKernel(RedbackContinuation);
+
+  registerMaterial(ImageProcessing);
   registerMaterial(RedbackMaterial);
   registerMaterial(RedbackMechMaterialJ2);
   registerMaterial(RedbackMechMaterialDP);
@@ -123,8 +135,12 @@ RedbackApp::registerObjects(Factory & factory)
   registerMaterial(RedbackMechMaterialCCanisotropic);
   registerMaterial(RedbackMechMaterialElastic);
 
+  registerMeshModifier(ElementFileSubdomain);
+
   registerExecutioner(ReturnMapIterDT);
 
+  registerAux(RedbackContinuationTangentAux);
+  registerAux(RedbackDiffVarsAux);
   registerAux(RedbackTotalPorosityAux);
 #undef registerObject
 #define registerObject(name) factory.regLegacy<name>(stringifyName(name))
