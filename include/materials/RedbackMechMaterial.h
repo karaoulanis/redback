@@ -191,7 +191,7 @@ protected:
 
   virtual void formDamageDissipation(RankTwoTensor &);
 
-  Real _damage_dissipation;
+  Real _damage_dissipation, _max_confining_pressure;
 };
 
 #endif // REDBACKMECHMATERIAL_H
