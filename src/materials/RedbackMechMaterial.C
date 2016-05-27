@@ -679,7 +679,7 @@ RedbackMechMaterial::returnMap(const RankTwoTensor & sig_old,
   _max_confining_pressure = fmax(_confining_pressure[ _qp ], _max_confining_pressure);
 
   _exponential = _exponential * std::exp(-_alpha_1[ _qp ] * _max_confining_pressure - _alpha_3[ _qp ]* _max_confining_pressure * _max_confining_pressure
-                                         -_pore_pres[ _qp ] * _alpha_2[ _qp ]);
+                                         -_pore_pres[ _qp ]  * (1 + 0.45 * std::log(_max_confining_pressure)) * _alpha_2[ _qp ]);
 
   while (err3 > tol3 && iterisohard < maxiterisohard) // Hardness update iteration
   {
