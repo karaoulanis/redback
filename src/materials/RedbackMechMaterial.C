@@ -675,10 +675,21 @@ RedbackMechMaterial::returnMap(const RankTwoTensor & sig_old,
   //                                       _pore_pres[ _qp ] * _alpha_2[ _qp ] *
   //                                         (1 + _alpha_3[ _qp ] * std::log(_confining_pressure[ _qp ])));
 
+<<<<<<< HEAD
+   // MUSTAFA fFORMULA
+   //_max_confining_pressure = fmax(_confining_pressure[ _qp ], _max_confining_pressure);
+
+  //_exponential = _exponential * std::exp(-_alpha_1[ _qp ] * _max_confining_pressure - _alpha_3[ _qp ]* _max_confining_pressure * _max_confining_pressure
+  //                                    -_pore_pres[ _qp ]  * (1 + 0.45 * std::log(_max_confining_pressure)) * _alpha_2[ _qp ]);
+=======
 //MUSTAFA FORMULA
   _max_confining_pressure = fmax(_confining_pressure[ _qp ], _max_confining_pressure);
+>>>>>>> 3b12f2f635fb602ad55635269f981af50b0f21f5
 
-  _exponential = _exponential * std::exp(-_alpha_1[ _qp ] * _max_confining_pressure - _alpha_3[ _qp ]* _max_confining_pressure * _max_confining_pressure
+  // THOMA & MANO  NEW formula
+   _max_confining_pressure = fmax(_confining_pressure[ _qp ], _max_confining_pressure);
+
+   _exponential = _exponential * std::exp(-_alpha_1[ _qp ] * _max_confining_pressure * (1.0+_alpha_3[ _qp ]* std::log(_max_confining_pressure) )
                                          -_pore_pres[ _qp ]  * (1 + 0.45 * std::log(_max_confining_pressure)) * _alpha_2[ _qp ]);
 
 //   TING NEW formula
