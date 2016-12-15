@@ -82,7 +82,9 @@ RedbackMechMaterialDP::getFlowIncrement(
   Real sig_eqv, Real pressure, Real q_yield_stress, Real p_yield_stress, Real yield_stress)
 {
   Real flow_incr_vol =
-    _ref_pe_rate * _dt * std::pow(macaulayBracket(pressure - p_yield_stress), _exponent) * _exponential;
+    _ref_pe_rate * _dt *
+    std::pow(macaulayBracket((pressure - p_yield_stress) * (_slope_yield_surface < 0 ? 1 : -1)), _exponent) *
+    _exponential;
   // TODO: q_yield_stress can be 0, we should handle that case properly...
   Real flow_incr_dev =
     _ref_pe_rate * _dt *
@@ -192,75 +194,4 @@ RedbackMechMaterialDP::get_py_qy(Real p, Real q, Real & p_y, Real & q_y, Real yi
 {
   p_y = getPressureProjection(p /*p*/, q /*q*/, yield_stress /*yield stress*/);
   q_y = yield_stress + _slope_yield_surface * p_y; // yield deviatoric stress
-}
-
-void
-RedbackMechMaterialDP::form_damage_kernels(Real cohesion)
-{
-  // update damage evolution law from selected method
-  switch (_damage_method)
-  {
-    case BrittleDamage:
-      formBrittleDamage();
-      break;
-    case CreepDamage:
-      formCreepDamage(cohesion);
-      break;
-    case BreakageMechanics:
-      mooseError("damage method not implemented yet, use other options");
-      break;
-    case DamageHealing:
-      mooseError("damage method not implemented yet, use other options");
-      break;
-    default:
-      mooseError("damage method not implemented yet, use other options");
-  }
-}
-
-void
-RedbackMechMaterialDP::formBrittleDamage()
-{
-  Real plastic_damage, healing_damage;
-  Real kachanov, exponent_kachanov;
-
-  // Kachanov's original law of Brittle Damage
-  exponent_kachanov = 1;
-  kachanov = _mises_stress[ _qp ] / (1 - _damage[ _qp ]);
-
-  plastic_damage = _damage_coeff * std::pow(kachanov, exponent_kachanov);
-  healing_damage = 0;
-
-  _damage_kernel[ _qp ] = plastic_damage + healing_damage;
-  _damage_kernel_jac[ _qp ] = 0;
-}
-
-void
-RedbackMechMaterialDP::formCreepDamage(Real cohesion)
-{
-  Real plastic_damage, healing_damage;
-  Real lambda_dot;
-  Real d_yield_dq; // The derivative of the yield surface with respect to the
-                   // deviatoric stress q
-
-  // Damage evolution law for creep damage
-  // J2 plastic potential with evolving cohesion for the damage evolution law
-  // (remember that cohesion is q_y which is updated as q_y * (1-D) in the
-  // get_py_qy_damaged function)
-  d_yield_dq = 1 / std::pow(cohesion, 2);
-
-  if (d_yield_dq > 0) // ensuring positiveness of the plastic multiplier
-  {
-    /* the plastic multiplier could be having this form:
-     * lambda_dot = _mises_stress[_qp] * _mises_strain_rate[_qp] / d_yield_dq;
-     * but cohesion in J2 plasticity is the mises stress at yield, so we are
-     * going with a much simpler form: */
-    lambda_dot = _mises_strain_rate[ _qp ] / d_yield_dq;
-  }
-  else
-    lambda_dot = 0;
-
-  plastic_damage = _damage_coeff * lambda_dot;
-  healing_damage = 0;
-  _damage_kernel[ _qp ] = plastic_damage + healing_damage;
-  _damage_kernel_jac[ _qp ] = 0;
 }

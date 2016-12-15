@@ -16,9 +16,8 @@
 #define REDBACKMECHMATERIAL_H
 
 #include "Material.h"
-#include "RankTwoTensor.h"
 #include "RankFourTensor.h"
-#include "ElasticityTensorR4.h"
+#include "RankTwoTensor.h"
 #include "RotationTensor.h"
 //#include "FiniteStrainPlasticMaterial.h"
 
@@ -69,11 +68,11 @@ protected:
   MaterialProperty<RankTwoTensor> & _stress;
   MaterialProperty<RankTwoTensor> & _total_strain;
   MaterialProperty<RankTwoTensor> & _elastic_strain;
-  MaterialProperty<ElasticityTensorR4> & _elasticity_tensor;
-  MaterialProperty<ElasticityTensorR4> & _Jacobian_mult;
+  MaterialProperty<RankFourTensor> & _elasticity_tensor;
+  MaterialProperty<RankFourTensor> & _Jacobian_mult;
 
   /// Individual material information
-  ElasticityTensorR4 _Cijkl;
+  RankFourTensor _Cijkl;
 
   // MaterialProperty<RankTwoTensor> & _d_stress_dT;
   // RankTwoTensor _strain_increment;
@@ -125,6 +124,7 @@ protected:
 
   Real _ref_pe_rate;
   Real _exponent;
+  Real _chemo_mechanical_porosity_coeff;
 
   Real macaulayBracket(Real);
 
@@ -138,6 +138,7 @@ protected:
   MaterialProperty<Real> & _volumetric_strain_rate;
   MaterialProperty<Real> & _total_volumetric_strain;
   MaterialProperty<Real> & _mechanical_porosity;
+  MaterialProperty<Real> & _mass_removal_rate;
   MaterialProperty<Real> & _poromech_kernel;
   MaterialProperty<Real> & _poromech_jac;
   MaterialProperty<Real> & _mod_gruntfest_number;
@@ -145,7 +146,7 @@ protected:
   MaterialProperty<Real> & _mechanical_dissipation_jac_mech;
   MaterialProperty<Real> & _damage_kernel;
   MaterialProperty<Real> & _damage_kernel_jac;
-  Real _damage_coeff, _healing_coeff;
+  Real _damage_coeff, _dmg_exponent, _healing_coeff;
 
   Real _exponential;
   // const VariableValue & _dispx_dot;
@@ -190,6 +191,8 @@ protected:
   virtual void form_damage_kernels(Real);
 
   virtual void formDamageDissipation(RankTwoTensor &);
+  virtual void formBrittleDamage();
+  virtual void formCreepDamage(Real);
 
   Real _damage_dissipation, _max_confining_pressure;
 };

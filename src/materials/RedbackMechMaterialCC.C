@@ -10,8 +10,8 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#include "RedbackMechMaterialCC.h"
 #include "Ellipse.h"
+#include "RedbackMechMaterialCC.h"
 #include <cmath> //used for fabs
 
 template <>
@@ -171,4 +171,9 @@ void
 RedbackMechMaterialCC::get_py_qy(Real p, Real q, Real & p_y, Real & q_y, Real yield_stress)
 {
   Ellipse::distanceCC(_slope_yield_surface, -yield_stress, p, q, p_y, q_y);
+}
+
+void
+RedbackMechMaterialCC::form_damage_kernels(Real q_y)
+{
 }
